@@ -1,5 +1,16 @@
+// until this is converted to a rust library,
+// any files you add in compiler will need to be listed here as mods
+// to be able to use them in other files
+mod compiler {
+  pub mod parser;
+  pub mod ast;
+  pub mod debug;
+}
+
 use std::fs::File;
 use std::io::prelude::*;
+
+use crate::compiler::parser::Parser;
 
 
 // This main entry point will be for debugging
@@ -20,7 +31,7 @@ fn main() {
   file.read_to_string(&mut source_code).unwrap();
 
 
-  let parse_tree = match parser.parse(source_code, None) {
+  let parse_tree = match parser.parse(&source_code, None) {
     Some(tree) => tree,
     None => {
       println!("Error parsing source code");
@@ -28,6 +39,11 @@ fn main() {
     }
   };
 
-  // Dump out parse tree
-  dbg!(parse_tree.root_node().to_sexp());
+  let parser = Parser::new(&source_code.as_bytes());
+
+  // This will be the root of our ast. (which is a scope)
+  let root = parser.parse(&parse_tree.root_node());
+
+  // dump the ast to terminal
+  dbg!(root);
 }
