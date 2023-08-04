@@ -5,7 +5,10 @@
   "main": "bindings/node",
   "scripts": {
     "generate": "npx tree-sitter generate",
-    "test-file": "npx tree-sitter parse test.titan"
+    "test-file": "npx tree-sitter parse test.titan",
+    "build": "tree-sitter generate",
+    "build:wasm": "npm run build && tree-sitter build-wasm --docker",
+    "playground": "npm run build:wasm && tree-sitter playground"
   },
   "author": "",
   "license": "ISC",
@@ -13,6 +16,6 @@
     "nan": "^2.17.0"
   },
   "devDependencies": {
-    "tree-sitter-cli": "^0.20.8"
+    "tree-sitter-cli": "0.20.7"
   }
 }
