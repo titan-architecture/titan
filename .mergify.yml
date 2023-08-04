@@ -7,7 +7,7 @@ queue_rules:
       - or:
         - status-success=Quality Gate
 
-pull_request_riles:
+pull_request_rules:
   - name: automatic merge
     actions:
       comment:
