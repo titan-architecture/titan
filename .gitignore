@@ -1,0 +1,13 @@
+node_modules/
+
+# tree-sitter ignores
+libs/tree-sitter-titan/log.html
+libs/tree-sitter-titan/*.wasm
+libs/tree-sitter-titan/build/
+libs/tree-sitter-titan/src/parser.c
+libs/tree-sitter-titan/src/grammar.json
+libs/tree-sitter-titan/src/node-types.json
+libs/tree-sitter-titan/src/tree_sitter/
+
+# titanc ignores
+libs/titanc/target/
