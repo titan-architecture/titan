@@ -3,6 +3,12 @@ use crate::compiler::ast::Scope;
 use crate::compiler::debug::Span;
 use std::str;
 
+// This file will contain our parser, it is responsible for taking the tree-sitter parse tree
+// and converting it into our AST that we will then use in the rest of the compiler
+// when a parser is created it will hold the source code as a byte array so that if we
+// need to extract something from the source code we can do it easily. IE if we need to
+// get the text of a node, we can just get the byte range of the node and then convert
+// that to a string using the source code byte array
 pub struct Parser<'a> {
   pub source_code: &'a [u8],
 }
