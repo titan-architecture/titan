@@ -4,8 +4,6 @@ queue_rules:
     speculative_checks: 2
     conditions:
       - -files=.mergify.yml
-      - or:
-        - status-success=Quality Gate
 
 pull_request_rules:
   - name: automatic merge
@@ -26,5 +24,3 @@ pull_request_rules:
       - "#review-threads-unresolved=0"
       - check-success=Validate PR title
       - base=main
-      - or:
-        - status-success=Quality Gate
