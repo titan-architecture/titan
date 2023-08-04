@@ -5,7 +5,10 @@
   "main": "bindings/node",
   "scripts": {
     "generate": "npx tree-sitter generate",
-    "test-file": "npx tree-sitter parse test.titan"
+    "test-file": "npx tree-sitter parse test.titan",
+    "build": "tree-sitter generate",
+    "build:wasm": "npm run build && tree-sitter build-wasm --docker",
+    "playground": "npm run build:wasm && tree-sitter playground"
   },
   "author": "",
   "license": "ISC",
