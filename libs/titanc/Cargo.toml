@@ -6,3 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tree-sitter = "0.20.9"
+tree-sitter-traversal = "0.1.2"
+tree-sitter-titan = { path = "../tree-sitter-titan" } # this is how we get the bindings from tree-sitter
