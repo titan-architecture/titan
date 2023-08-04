@@ -28,7 +28,7 @@ jobs:
             chore
             revert
             build
-          subjectPattern: ^[^A-Z][^:]+[^.]$
+          subjectPattern: ^[^:]+$
           subjectPatternError: pr title should match pattern "type(scope)':' subject"
           requiredScope: false
           
