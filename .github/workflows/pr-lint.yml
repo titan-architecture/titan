@@ -1,0 +1,34 @@
+name: Pull Request Lint
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+jobs:
+  validate:
+    name: Validate PR title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-pr-lint@v1
+        env:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          scopes: |-
+            compiler
+            grammar
+            docs
+          types: |-
+            feat
+            fix
+            docs
+            chore
+            revert
+            build
+          subjectPattern: ^[^A-Z][^:]+[^.]$
+          subjectPatternError: pr title should match pattern "type(scope)':' subject"
+          requiredScope: false
+          
