@@ -21,13 +21,13 @@ jobs:
             compiler
             grammar
             docs
+            build
           types: |-
             feat
             fix
             docs
             chore
             revert
-            build
           subjectPattern: ^[^:]+$
           subjectPatternError: pr title should match pattern "type(scope)':' subject"
           requireScope: false
