@@ -1,6 +1,9 @@
 module.exports = grammar({
   name: "titan",
   rules: {
+    source_file: $ => repeat($._statement),
+
+    _statement: ($) => choice($.variable_definition),
     variable_definition: ($) =>
       seq(
         $._variable_start,
