@@ -29,7 +29,7 @@ module.exports = grammar({
     _non_null_literal: ($) => choice($.string, $.integer_literal),
 
     // TODO: Replace with choice(simple string and multi line string)
-    string: ($) => $.alpha_identifier,
+    string: ($) => seq('"', $.alpha_identifier, '"'),
 
     integer_literal: ($) =>
       token(
