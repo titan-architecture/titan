@@ -23,7 +23,7 @@ module.exports = grammar({
     _variable_start: ($) => seq("let"),
 
     // TODO: Add other types, maybe function/lambda
-    _type: ($) => choice($.literal_type),
+    _type: ($) => choice("string", "int", "bool"), // choice($.literal_type),
 
     // TODO: Add other types, string, float, etc
     _non_null_literal: ($) => choice($.string, $.integer_literal),
