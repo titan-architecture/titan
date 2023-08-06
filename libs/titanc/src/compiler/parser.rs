@@ -12,74 +12,74 @@ use super::ast::{Statement, StatementKind};
 // get the text of a node, we can just get the byte range of the node and then convert
 // that to a string using the source code byte array
 pub struct Parser<'a> {
-	pub source_code: &'a [u8],
+  pub source_code: &'a [u8],
 }
 
 impl<'b> Parser<'b> {
-	pub fn new(source_code: &'b [u8]) -> Self {
-		Self { source_code }
-	}
+  pub fn new(source_code: &'b [u8]) -> Self {
+    Self { source_code }
+  }
 
-	pub fn parse(&self, root: &Node) -> Scope {
-		match root.kind() {
-			"source_file" => self.build_scope(&root),
-			_ => panic!("Unexpected root node kind: {}", root.kind()), // tree-sitter parse tree should always start  with source
-		}
-	}
+  pub fn parse(&self, root: &Node) -> Scope {
+    match root.kind() {
+      "source_file" => self.build_scope(&root),
+      _ => panic!("Unexpected root node kind: {}", root.kind()), // tree-sitter parse tree should always start  with source
+    }
+  }
 
-	pub fn build_scope(&self, root: &Node) -> Scope {
-		let span = self.node_span(&root);
+  pub fn build_scope(&self, root: &Node) -> Scope {
+    let span = self.node_span(&root);
 
-		let mut cursor = root.walk();
+    let mut cursor = root.walk();
 
-		let scope = Scope {
-			statements: root
-				.named_children(&mut cursor)
-				.enumerate()
-				.filter_map(|(_, statement_node)| self.build_statement(&statement_node))
-				.collect(),
-			span,
-		};
+    let scope = Scope {
+      statements: root
+        .named_children(&mut cursor)
+        .enumerate()
+        .filter_map(|(_, statement_node)| self.build_statement(&statement_node))
+        .collect(),
+      span,
+    };
 
-		scope
-	}
+    scope
+  }
 
-	// helper function that takes a node and creates a Span from it
-	pub fn node_span(&self, node: &Node) -> Span {
-		let node_range = node.range();
-		Span {
-			start: node_range.start_byte,
-			end: node_range.end_byte,
-		}
-	}
+  // helper function that takes a node and creates a Span from it
+  pub fn node_span(&self, node: &Node) -> Span {
+    let node_range = node.range();
+    Span {
+      start: node_range.start_byte,
+      end: node_range.end_byte,
+    }
+  }
 
-	fn build_statement(&self, statement_node: &Node) -> Option<Statement> {
-		let span = self.node_span(statement_node);
-		match statement_node.kind() {
-			"variable_definition" => {
-				let kind = self.build_definition_statement(&statement_node);
-				Some(Statement { kind, span })
-			}
-			_ => None,
-		}
-	}
+  fn build_statement(&self, statement_node: &Node) -> Option<Statement> {
+    let span = self.node_span(statement_node);
+    match statement_node.kind() {
+      "variable_definition" => {
+        let kind = self.build_definition_statement(&statement_node);
+        Some(Statement { kind, span })
+      }
+      _ => None,
+    }
+  }
 
-	fn build_definition_statement(&self, statement_node: &Node) -> StatementKind {
-		let _type = statement_node.child_by_field_name("type");
-		let pattern = self
-			.node_text(&statement_node.child_by_field_name("pattern").unwrap())
-			.into();
-		let value = self
-			.node_text(&statement_node.child_by_field_name("value").unwrap())
-			.into();
+  fn build_definition_statement(&self, statement_node: &Node) -> StatementKind {
+    let _type = statement_node.child_by_field_name("type");
+    let pattern = self
+      .node_text(&statement_node.child_by_field_name("pattern").unwrap())
+      .into();
+    let value = self
+      .node_text(&statement_node.child_by_field_name("value").unwrap())
+      .into();
 
-		StatementKind::Let {
-			identifier: pattern,
-			value,
-		}
-	}
+    StatementKind::Let {
+      identifier: pattern,
+      value,
+    }
+  }
 
-	fn node_text<'a>(&'a self, node: &Node) -> &'a str {
-		return str::from_utf8(&self.source_code[node.byte_range()]).unwrap();
-	}
+  fn node_text<'a>(&'a self, node: &Node) -> &'a str {
+    return str::from_utf8(&self.source_code[node.byte_range()]).unwrap();
+  }
 }
