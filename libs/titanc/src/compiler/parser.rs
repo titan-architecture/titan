@@ -83,4 +83,3 @@ impl<'b> Parser<'b> {
 		return str::from_utf8(&self.source_code[node.byte_range()]).unwrap();
 	}
 }
-
