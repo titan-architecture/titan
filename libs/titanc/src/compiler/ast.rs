@@ -5,6 +5,17 @@ use crate::compiler::debug::Span;
 
 #[derive(Debug)]
 pub struct Scope {
-  pub text: String, // this is only here until we add change the grammar
-  pub span: Span
+	pub statements: Vec<Statement>,
+	pub span: Span,
+}
+
+#[derive(Debug, Clone)]
+pub struct Statement {
+	pub kind: StatementKind,
+	pub span: Span,
+}
+
+#[derive(Debug, Clone)]
+pub enum StatementKind {
+	Let { identifier: String, value: String },
 }
