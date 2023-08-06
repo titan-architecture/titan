@@ -17,5 +17,24 @@ pub struct Statement {
 
 #[derive(Debug)]
 pub enum StatementKind {
-  Let { identifier: String, value: String },
+  Let {
+    identifier: String,
+    value: String,
+    _type: Option<Typing>,
+    span: Span,
+  },
+}
+
+#[derive(Debug)]
+pub struct Typing {
+  pub kind: TypeKind,
+  pub span: Option<Span>,
+}
+
+#[derive(Debug)]
+pub enum TypeKind {
+  String,
+  Integer,
+  Inferred,
+  Boolean,
 }

@@ -1,14 +1,14 @@
 module.exports = grammar({
   name: "titan",
   rules: {
-    source_file: $ => repeat($._statement),
+    source_file: ($) => repeat($._statement),
 
     _statement: ($) => choice($.variable_definition),
     variable_definition: ($) =>
       seq(
         $._variable_start,
         field("pattern", $.alpha_identifier),
-        optional(seq(":", field("type", $._type))),
+        optional(seq(":", field("type", $.alpha_identifier))),
         "=",
         field("value", $._non_null_literal)
       ),
@@ -23,7 +23,7 @@ module.exports = grammar({
     _variable_start: ($) => seq("let"),
 
     // TODO: Add other types, maybe function/lambda
-    _type: ($) => choice("string", "int", "bool"), // choice($.literal_type),
+    _type: ($) => choice($.literal_type),
 
     // TODO: Add other types, string, float, etc
     _non_null_literal: ($) => choice($.string, $.integer_literal),
