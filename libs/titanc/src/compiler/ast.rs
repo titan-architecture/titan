@@ -9,13 +9,13 @@ pub struct Scope {
   pub span: Span,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Statement {
   pub kind: StatementKind,
   pub span: Span,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum StatementKind {
   Let { identifier: String, value: String },
 }
