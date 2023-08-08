@@ -60,7 +60,7 @@ impl<'b> Parser<'b> {
         let kind = self.build_definition_statement(&statement_node);
         Some(Statement { kind, span })
       }
-      _ => None,
+      _ => panic!("Unexpected statement node kind: {}", statement_node.kind()),
     }
   }
 
