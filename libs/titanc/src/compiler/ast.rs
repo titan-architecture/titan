@@ -5,6 +5,36 @@ use crate::compiler::debug::Span;
 
 #[derive(Debug)]
 pub struct Scope {
-  pub text: String, // this is only here until we add change the grammar
-  pub span: Span
+  pub statements: Vec<Statement>,
+  pub span: Span,
+}
+
+#[derive(Debug)]
+pub struct Statement {
+  pub kind: StatementKind,
+  pub span: Span,
+}
+
+#[derive(Debug)]
+pub enum StatementKind {
+  Let {
+    identifier: String,
+    value: String,
+    _type: Option<Typing>,
+    span: Span,
+  },
+}
+
+#[derive(Debug)]
+pub struct Typing {
+  pub kind: TypeKind,
+  pub span: Option<Span>,
+}
+
+#[derive(Debug)]
+pub enum TypeKind {
+  String,
+  Integer,
+  Inferred,
+  Boolean,
 }

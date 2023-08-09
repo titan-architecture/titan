@@ -2,16 +2,15 @@
 // any files you add in compiler will need to be listed here as mods
 // to be able to use them in other files
 mod compiler {
-  pub mod parser;
   pub mod ast;
   pub mod debug;
+  pub mod parser;
 }
 
 use std::fs::File;
 use std::io::prelude::*;
 
 use crate::compiler::parser::Parser;
-
 
 // This main entry point will be for debugging
 // eventually we wont need it since this compiler should become
@@ -29,7 +28,6 @@ fn main() {
   let mut file = File::open("../tree-sitter-titan/test.titan").unwrap();
   let mut source_code = String::new();
   file.read_to_string(&mut source_code).unwrap();
-
 
   let parse_tree = match parser.parse(&source_code, None) {
     Some(tree) => tree,

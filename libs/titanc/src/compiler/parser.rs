@@ -1,7 +1,9 @@
-use tree_sitter::Node;
 use crate::compiler::ast::Scope;
 use crate::compiler::debug::Span;
 use std::str;
+use tree_sitter::Node;
+
+use super::ast::{Statement, StatementKind, TypeKind, Typing};
 
 // This file will contain our parser, it is responsible for taking the tree-sitter parse tree
 // and converting it into our AST that we will then use in the rest of the compiler
@@ -15,26 +17,31 @@ pub struct Parser<'a> {
 
 impl<'b> Parser<'b> {
   pub fn new(source_code: &'b [u8]) -> Self {
-    Self {
-      source_code
-    }
+    Self { source_code }
   }
 
   pub fn parse(&self, root: &Node) -> Scope {
     match root.kind() {
       "source_file" => self.build_scope(&root),
-      _ => panic!("Unexpected root node kind: {}", root.kind()) // tree-sitter parse tree should always start  with source
+      _ => panic!("Unexpected root node kind: {}", root.kind()), // tree-sitter parse tree should always start  with source
     }
   }
 
   pub fn build_scope(&self, root: &Node) -> Scope {
     let span = self.node_span(&root);
-    let node_text = self.node_text(&root);
-    
-    Scope {
-      text: node_text.to_string(),
-      span
-    }
+
+    let mut cursor = root.walk();
+
+    let scope = Scope {
+      statements: root
+        .named_children(&mut cursor)
+        .enumerate()
+        .filter_map(|(_, statement_node)| self.build_statement(&statement_node))
+        .collect(),
+      span,
+    };
+
+    scope
   }
 
   // helper function that takes a node and creates a Span from it
@@ -46,8 +53,72 @@ impl<'b> Parser<'b> {
     }
   }
 
-  // helper that gets the text out of a node
+  fn build_statement(&self, statement_node: &Node) -> Option<Statement> {
+    let span = self.node_span(statement_node);
+    match statement_node.kind() {
+      "variable_definition" => {
+        let kind = self.build_definition_statement(&statement_node);
+        Some(Statement { kind, span })
+      }
+      _ => panic!("Unexpected statement node kind: {}", statement_node.kind()),
+    }
+  }
+
+  fn build_definition_statement(&self, statement_node: &Node) -> StatementKind {
+    let _type = if let Some(type_node) = statement_node.child_by_field_name("type") {
+      self.build_type_kind(Some(type_node)).ok()
+    } else {
+      None
+    };
+    let pattern = self
+      .node_text(&statement_node.child_by_field_name("pattern").unwrap())
+      .into();
+    let value = self
+      .node_text(&statement_node.child_by_field_name("value").unwrap())
+      .into();
+
+    StatementKind::Let {
+      identifier: pattern,
+      value,
+      _type,
+      span: self.node_span(statement_node),
+    }
+  }
+
   fn node_text<'a>(&'a self, node: &Node) -> &'a str {
-		return str::from_utf8(&self.source_code[node.byte_range()]).unwrap();
-	}
+    return str::from_utf8(&self.source_code[node.byte_range()]).unwrap();
+  }
+
+  fn build_type_kind(&self, type_node: Option<Node>) -> Result<Typing, ()> {
+    let type_node = &match type_node {
+      Some(node) => node,
+      None => {
+        return Ok(Typing {
+          kind: TypeKind::Inferred,
+          span: None,
+        })
+      }
+    };
+
+    let span = Some(self.node_span(type_node));
+
+    match type_node.kind() {
+      "alpha_identifier" => match self.node_text(type_node) {
+        "string" => Ok(Typing {
+          kind: TypeKind::String,
+          span,
+        }),
+        "int" => Ok(Typing {
+          kind: TypeKind::Integer,
+          span,
+        }),
+        "bool" => Ok(Typing {
+          kind: TypeKind::Boolean,
+          span,
+        }),
+        _ => Err(()),
+      },
+      _ => Err(()),
+    }
+  }
 }
