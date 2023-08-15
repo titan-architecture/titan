@@ -6,6 +6,10 @@ mod compiler {
   pub mod debug;
   pub mod parser;
 }
+mod interpreter {
+  pub mod interpret;
+  pub mod environment;
+}
 
 use std::fs::File;
 use std::io::prelude::*;
@@ -42,6 +46,8 @@ fn main() {
   // This will be the root of our ast. (which is a scope)
   let root = parser.parse(&parse_tree.root_node());
 
-  // dump the ast to terminal
-  dbg!(root);
+  // create an interpreter and interpret the ast
+  let interpreter = interpreter::interpret::Interpreter::new(&root);
+  interpreter.interpret();
+
 }

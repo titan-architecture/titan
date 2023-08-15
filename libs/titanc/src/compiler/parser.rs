@@ -60,7 +60,22 @@ impl<'b> Parser<'b> {
         let kind = self.build_definition_statement(&statement_node);
         Some(Statement { kind, span })
       }
+      "print_statement" => {
+        let kind = self.build_print_statement(&statement_node);
+        Some(Statement { kind, span })
+      }
       _ => panic!("Unexpected statement node kind: {}", statement_node.kind()),
+    }
+  }
+
+  fn build_print_statement(&self, statement_node: &Node) -> StatementKind {
+    let identifier = self
+      .node_text(&statement_node.child_by_field_name("identifier").unwrap())
+      .into();
+
+    StatementKind::Print {
+      identifier,
+      span: self.node_span(statement_node),
     }
   }
 
