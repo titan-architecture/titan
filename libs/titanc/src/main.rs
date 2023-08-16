@@ -5,6 +5,7 @@ mod compiler {
   pub mod ast;
   pub mod debug;
   pub mod parser;
+  pub mod type_checker;
 }
 mod interpreter {
   pub mod interpret;
@@ -45,6 +46,10 @@ fn main() {
 
   // This will be the root of our ast. (which is a scope)
   let root = parser.parse(&parse_tree.root_node());
+
+  // Type check
+  let mut type_checker = compiler::type_checker::TypeChecker::new();
+  type_checker.type_check_scope(&root);
 
   // create an interpreter and interpret the ast
   let interpreter = interpreter::interpret::Interpreter::new(&root);
