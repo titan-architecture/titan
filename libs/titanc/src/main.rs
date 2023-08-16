@@ -7,6 +7,10 @@ mod compiler {
   pub mod parser;
   pub mod type_checker;
 }
+mod interpreter {
+  pub mod interpret;
+  pub mod environment;
+}
 
 use std::fs::File;
 use std::io::prelude::*;
@@ -47,6 +51,8 @@ fn main() {
   let mut type_checker = compiler::type_checker::TypeChecker::new();
   type_checker.type_check_scope(&root);
 
-  // dump the ast to terminal
-  dbg!(root);
+  // create an interpreter and interpret the ast
+  let interpreter = interpreter::interpret::Interpreter::new(&root);
+  interpreter.interpret();
+
 }

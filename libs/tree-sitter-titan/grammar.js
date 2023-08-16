@@ -3,7 +3,13 @@ module.exports = grammar({
   rules: {
     source_file: ($) => repeat($._statement),
 
-    _statement: ($) => choice($.variable_definition),
+    _statement: ($) => choice(
+      $.variable_definition,
+      $.print_statement,
+    ),
+
+    print_statement: ($) => seq("print", "(", field("identifier", $.alpha_identifier), ")"),
+
     variable_definition: ($) =>
       seq(
         $._variable_start,

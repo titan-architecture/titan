@@ -1,3 +1,6 @@
 let hello = 1
 let hello2 = 3
 let integer: int = 4
+print(hello)
+print(hello2)
+print(integer)
