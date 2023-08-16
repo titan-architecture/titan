@@ -23,6 +23,10 @@ pub enum StatementKind {
     _type: Option<Typing>,
     span: Span,
   },
+  Print {
+    identifier: String, // TODO: handle expressions and literals
+    span: Span,
+  },
 }
 
 #[derive(Debug)]
