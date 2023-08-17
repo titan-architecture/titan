@@ -3,14 +3,12 @@ use crate::compiler::ast::{Scope, Statement, StatementKind};
 use super::environment::Environment;
 
 pub struct Interpreter<'a> {
-  pub scope: &'a Scope
+  pub scope: &'a Scope,
 }
 
 impl<'b> Interpreter<'b> {
   pub fn new(scope: &'b Scope) -> Self {
-    Self {
-      scope
-    }
+    Self { scope }
   }
 
   pub fn interpret(&self) {
@@ -27,10 +25,15 @@ impl<'b> Interpreter<'b> {
 
   pub fn interpret_statement(&self, statement: &Statement, mut env: Environment) -> Environment {
     match &statement.kind {
-      StatementKind::Let { identifier, value, type_annotation: _type, .. } => {
+      StatementKind::Let {
+        identifier,
+        value,
+        type_annotation: _type,
+        ..
+      } => {
         env.define_variable(identifier.clone(), format!("{:?}", value.kind));
       }
-      StatementKind::Print { identifier, ..} => {
+      StatementKind::Print { identifier, .. } => {
         // TODO: support printing expressions and literals
         let value = env.get_variable(identifier);
         if let Some(val) = value {

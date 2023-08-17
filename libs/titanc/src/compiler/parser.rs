@@ -3,7 +3,7 @@ use crate::compiler::debug::Span;
 use std::str;
 use tree_sitter::Node;
 
-use super::ast::{Statement, StatementKind, TypeKind, Typing, Expression, ExpressionKind, Literal};
+use super::ast::{Expression, ExpressionKind, Literal, Statement, StatementKind, TypeKind, Typing};
 
 // This file will contain our parser, it is responsible for taking the tree-sitter parse tree
 // and converting it into our AST that we will then use in the rest of the compiler
@@ -81,21 +81,19 @@ impl<'b> Parser<'b> {
       "integer_literal" => {
         let int_value: f64 = self.node_text(expr_node).parse().expect("Not a valid integer");
         Expression {
-          kind: ExpressionKind::Literal(Literal::Integer(int_value))
-        }
-      } 
-      "string" => {
-        Expression {
-          kind: ExpressionKind::Literal(Literal::String(self.node_text(expr_node).to_string()))
+          kind: ExpressionKind::Literal(Literal::Integer(int_value)),
         }
       }
+      "string" => Expression {
+        kind: ExpressionKind::Literal(Literal::String(self.node_text(expr_node).to_string())),
+      },
       "boolean_literal" => {
         let bool_value: bool = self.node_text(expr_node).parse().expect("Not a valid boolean value");
         Expression {
-          kind: ExpressionKind::Literal(Literal::Boolean(bool_value))
+          kind: ExpressionKind::Literal(Literal::Boolean(bool_value)),
         }
       }
-      _ => panic!("unexpected expr node: {}", expr_node.kind())
+      _ => panic!("unexpected expr node: {}", expr_node.kind()),
     }
   }
 
@@ -139,7 +137,7 @@ impl<'b> Parser<'b> {
       "bool" => Ok(Typing {
         kind: TypeKind::Boolean,
       }),
-      _ => panic!("unkown type annotation: {}", type_node.kind())
+      _ => panic!("unkown type annotation: {}", type_node.kind()),
     }
   }
 }

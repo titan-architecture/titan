@@ -45,15 +45,14 @@ pub struct Expression {
   pub kind: ExpressionKind,
 }
 
-
 #[derive(Debug)]
 pub enum ExpressionKind {
-  Literal(Literal)
+  Literal(Literal),
 }
 
 #[derive(Debug)]
 pub enum Literal {
   String(String),
   Boolean(bool),
-  Integer(f64)
+  Integer(f64),
 }

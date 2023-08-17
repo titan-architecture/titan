@@ -1,4 +1,7 @@
-use super::{ast::{Scope, Statement, StatementKind, TypeKind, ExpressionKind, Literal, Expression}, symbol_table::{SymbolTable, Symbol}};
+use super::{
+  ast::{Expression, ExpressionKind, Literal, Scope, Statement, StatementKind, TypeKind},
+  symbol_table::{Symbol, SymbolTable},
+};
 
 pub struct TypeChecker {
   symbol_table: SymbolTable,
@@ -7,7 +10,7 @@ pub struct TypeChecker {
 impl TypeChecker {
   pub fn new() -> TypeChecker {
     TypeChecker {
-      symbol_table: SymbolTable::new()
+      symbol_table: SymbolTable::new(),
     }
   }
 
@@ -21,15 +24,15 @@ impl TypeChecker {
     self.symbol_table.pop_scope();
   }
 
-  pub fn type_of_expression(&mut self, expr: &Expression) -> TypeKind{
+  pub fn type_of_expression(&mut self, expr: &Expression) -> TypeKind {
     match &expr.kind {
       ExpressionKind::Literal(lit) => match &lit {
         Literal::Boolean(_) => TypeKind::Boolean,
         Literal::Integer(_) => TypeKind::Integer,
         Literal::String(_) => TypeKind::String,
-        _ => panic!("unexpected literal kind: {:?}", lit)
+        _ => panic!("unexpected literal kind: {:?}", lit),
       },
-      _ => panic!("unexpected expression kind: {:?}", &expr.kind)
+      _ => panic!("unexpected expression kind: {:?}", &expr.kind),
     }
   }
 
@@ -39,7 +42,7 @@ impl TypeChecker {
     }
   }
 
-  pub fn type_check_statement(&mut self, statement: &Statement,) {
+  pub fn type_check_statement(&mut self, statement: &Statement) {
     match &statement.kind {
       StatementKind::Let {
         identifier,
@@ -51,13 +54,16 @@ impl TypeChecker {
           panic!("Cannot infer types of variables yet");
         }
 
-        match self.symbol_table.add_symbol(Symbol { name: identifier.clone(), type_: type_annotation.as_ref().unwrap().kind }) {
+        match self.symbol_table.add_symbol(Symbol {
+          name: identifier.clone(),
+          type_: type_annotation.as_ref().unwrap().kind,
+        }) {
           Err(msg) => {
             panic!("{}", msg);
           }
           _ => {}
         }
-        
+
         // check type annotation against expression type
         let expr_type = self.type_of_expression(value);
         self.assert_type_matches(&expr_type, &type_annotation.as_ref().unwrap().kind)

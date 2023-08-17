@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use super::ast::TypeKind;
 
-
 #[derive(Clone)]
 pub struct Symbol {
   pub(crate) name: String,
