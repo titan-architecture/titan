@@ -1,4 +1,4 @@
-use super::{ast::{Scope, Statement, StatementKind, TypeKind, ExpressionKind, Literal}, symbol_table::{SymbolTable, Symbol}};
+use super::{ast::{Scope, Statement, StatementKind, TypeKind, ExpressionKind, Literal, Expression}, symbol_table::{SymbolTable, Symbol}};
 
 pub struct TypeChecker {
   symbol_table: SymbolTable,
@@ -16,6 +16,26 @@ impl TypeChecker {
 
     for statement in &scope.statements {
       self.type_check_statement(&statement);
+    }
+
+    self.symbol_table.pop_scope();
+  }
+
+  pub fn type_of_expression(&mut self, expr: &Expression) -> TypeKind{
+    match &expr.kind {
+      ExpressionKind::Literal(lit) => match &lit {
+        Literal::Boolean(_) => TypeKind::Boolean,
+        Literal::Integer(_) => TypeKind::Integer,
+        Literal::String(_) => TypeKind::String,
+        _ => panic!("unexpected literal kind: {:?}", lit)
+      },
+      _ => panic!("unexpected expression kind: {:?}", &expr.kind)
+    }
+  }
+
+  pub fn assert_type_matches(&mut self, actual_type: &TypeKind, expected_type: &TypeKind) {
+    if !matches!(actual_type, expected_type) {
+      panic!("expected type: \"{:?}\" but got: \"{:?}\"", expected_type, actual_type);
     }
   }
 
@@ -39,36 +59,8 @@ impl TypeChecker {
         }
         
         // check type annotation against expression type
-        match type_annotation.as_ref().unwrap().kind {
-          TypeKind::String => {
-            match &value.kind {
-              ExpressionKind::Literal(lit) => {
-                if !matches!(lit, Literal::String(_)) {
-                  panic!("expected string but got: {:?}", lit);
-                }
-              }
-            }
-          }
-          TypeKind::Boolean => {
-            match &value.kind {
-              ExpressionKind::Literal(lit) => {
-                if !matches!(lit, Literal::Boolean(_)) {
-                  panic!("expected boolean but got: {:?}", lit);
-                }
-              }
-            }
-          }
-          TypeKind::Integer => {
-            match &value.kind {
-              ExpressionKind::Literal(lit) => {
-                if !matches!(lit, Literal::Integer(_)) {
-                  panic!("expected integer but got: {:?}", lit);
-                }
-              }
-            }
-          }
-          _ => panic!("unable to verify type")
-        }
+        let expr_type = self.type_of_expression(value);
+        self.assert_type_matches(&expr_type, &type_annotation.as_ref().unwrap().kind)
       }
       _ => {}
     }
