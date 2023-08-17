@@ -14,10 +14,16 @@ module.exports = grammar({
       seq(
         $._variable_start,
         field("pattern", $.alpha_identifier),
-        optional(seq(":", field("type", $.alpha_identifier))),
+        optional(seq(":", field("type", $._type_annotation))),
         "=",
         field("value", $._non_null_literal)
       ),
+
+    _type_annotation: ($) => choice(
+      "bool",
+      "string",
+      "int"
+    ),
 
     // TODO: Declare without assign
     variable_declaration: ($) => seq(),
@@ -32,10 +38,12 @@ module.exports = grammar({
     _type: ($) => choice($.literal_type),
 
     // TODO: Add other types, string, float, etc
-    _non_null_literal: ($) => choice($.string, $.integer_literal),
+    _non_null_literal: ($) => choice($.string, $.integer_literal, $.boolean_literal),
 
     // TODO: Replace with choice(simple string and multi line string)
-    string: ($) => seq('"', $.alpha_identifier, '"'),
+    string: ($) => seq('"', choice($.alpha_identifier, $.integer_literal), '"'),
+
+    boolean_literal: ($) => choice("true", "false"),
 
     integer_literal: ($) =>
       token(

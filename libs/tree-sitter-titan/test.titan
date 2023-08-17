@@ -1,6 +1,8 @@
-let hello = 1
-let hello2 = 3
+let hello: int = 1
+let hello2: string = "3"
 let integer: int = 4
+let b: bool = false
 print(hello)
 print(hello2)
 print(integer)
+print(b)

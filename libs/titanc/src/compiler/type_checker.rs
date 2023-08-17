@@ -1,56 +1,76 @@
-use super::ast::{Scope, Statement, StatementKind, TypeKind};
+use super::{ast::{Scope, Statement, StatementKind, TypeKind, ExpressionKind, Literal}, symbol_table::{SymbolTable, Symbol}};
 
-pub struct TypeChecker<> {
-
+pub struct TypeChecker {
+  symbol_table: SymbolTable,
 }
 
 impl TypeChecker {
   pub fn new() -> TypeChecker {
-    TypeChecker {}
+    TypeChecker {
+      symbol_table: SymbolTable::new()
+    }
   }
 
-  pub fn type_check_scope(&self, scope: &Scope) {
+  pub fn type_check_scope(&mut self, scope: &Scope) {
+    self.symbol_table.push_scope();
+
     for statement in &scope.statements {
       self.type_check_statement(&statement);
     }
   }
 
-  pub fn type_check_statement(&self, statement: &Statement) {
+  pub fn type_check_statement(&mut self, statement: &Statement,) {
     match &statement.kind {
-      StatementKind::Let { identifier, value, _type, .. } => {
-        if let None = &_type {
+      StatementKind::Let {
+        identifier,
+        value,
+        type_annotation,
+        ..
+      } => {
+        if let None = &type_annotation {
           panic!("Cannot infer types of variables yet");
         }
 
-        if let Some(typing) = _type {
-          match typing.kind {
-            TypeKind::String => {
-              if value.starts_with("\"") && value.ends_with("\"") {
-                return;
-              } else {
-                panic!("expected string literal for variable {:?} but got {:?}", identifier, value);
+        match self.symbol_table.add_symbol(Symbol { name: identifier.clone(), type_: type_annotation.as_ref().unwrap().kind }) {
+          Err(msg) => {
+            panic!("{}", msg);
+          }
+          _ => {}
+        }
+        
+        // check type annotation against expression type
+        match type_annotation.as_ref().unwrap().kind {
+          TypeKind::String => {
+            match &value.kind {
+              ExpressionKind::Literal(lit) => {
+                if !matches!(lit, Literal::String(_)) {
+                  panic!("expected string but got: {:?}", lit);
+                }
               }
-            }
-            TypeKind::Integer => {
-              if value.parse::<i32>().is_ok() {
-                return;
-              } else {
-                panic!("expected integer literal for variable {:?} but got {:?}", identifier, value);
-              }
-            }
-            TypeKind::Boolean => {
-              if value == "true" || value == "false" {
-                return;
-              } else {
-                panic!("expected boolean literal for variable {:?} but got {:?}", identifier, value);
-              }
-            }
-            _ => {
-              panic!("cannot type check {:?} yet", typing.kind);
             }
           }
+          TypeKind::Boolean => {
+            match &value.kind {
+              ExpressionKind::Literal(lit) => {
+                if !matches!(lit, Literal::Boolean(_)) {
+                  panic!("expected boolean but got: {:?}", lit);
+                }
+              }
+            }
+          }
+          TypeKind::Integer => {
+            match &value.kind {
+              ExpressionKind::Literal(lit) => {
+                if !matches!(lit, Literal::Integer(_)) {
+                  panic!("expected integer but got: {:?}", lit);
+                }
+              }
+            }
+          }
+          _ => panic!("unable to verify type")
         }
       }
+      _ => {}
     }
   }
 }

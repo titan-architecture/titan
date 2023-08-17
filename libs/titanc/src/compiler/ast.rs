@@ -19,26 +19,41 @@ pub struct Statement {
 pub enum StatementKind {
   Let {
     identifier: String,
-    value: String,
-    _type: Option<Typing>,
-    span: Span,
+    value: Expression,
+    type_annotation: Option<Typing>,
   },
   Print {
     identifier: String, // TODO: handle expressions and literals
-    span: Span,
   },
 }
 
 #[derive(Debug)]
 pub struct Typing {
   pub kind: TypeKind,
-  pub span: Option<Span>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum TypeKind {
   String,
   Integer,
   Inferred,
   Boolean,
+}
+
+#[derive(Debug)]
+pub struct Expression {
+  pub kind: ExpressionKind,
+}
+
+
+#[derive(Debug)]
+pub enum ExpressionKind {
+  Literal(Literal)
+}
+
+#[derive(Debug)]
+pub enum Literal {
+  String(String),
+  Boolean(bool),
+  Integer(f64)
 }

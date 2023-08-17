@@ -3,7 +3,7 @@ use crate::compiler::debug::Span;
 use std::str;
 use tree_sitter::Node;
 
-use super::ast::{Statement, StatementKind, TypeKind, Typing};
+use super::ast::{Statement, StatementKind, TypeKind, Typing, Expression, ExpressionKind, Literal};
 
 // This file will contain our parser, it is responsible for taking the tree-sitter parse tree
 // and converting it into our AST that we will then use in the rest of the compiler
@@ -73,9 +73,29 @@ impl<'b> Parser<'b> {
       .node_text(&statement_node.child_by_field_name("identifier").unwrap())
       .into();
 
-    StatementKind::Print {
-      identifier,
-      span: self.node_span(statement_node),
+    StatementKind::Print { identifier }
+  }
+
+  fn build_expression(&self, expr_node: &Node) -> Expression {
+    match expr_node.kind() {
+      "integer_literal" => {
+        let int_value: f64 = self.node_text(expr_node).parse().expect("Not a valid integer");
+        Expression {
+          kind: ExpressionKind::Literal(Literal::Integer(int_value))
+        }
+      } 
+      "string" => {
+        Expression {
+          kind: ExpressionKind::Literal(Literal::String(self.node_text(expr_node).to_string()))
+        }
+      }
+      "boolean_literal" => {
+        let bool_value: bool = self.node_text(expr_node).parse().expect("Not a valid boolean value");
+        Expression {
+          kind: ExpressionKind::Literal(Literal::Boolean(bool_value))
+        }
+      }
+      _ => panic!("unexpected expr node: {}", expr_node.kind())
     }
   }
 
@@ -88,15 +108,12 @@ impl<'b> Parser<'b> {
     let pattern = self
       .node_text(&statement_node.child_by_field_name("pattern").unwrap())
       .into();
-    let value = self
-      .node_text(&statement_node.child_by_field_name("value").unwrap())
-      .into();
+    let value = self.build_expression(&statement_node.child_by_field_name("value").unwrap());
 
     StatementKind::Let {
       identifier: pattern,
       value,
-      _type,
-      span: self.node_span(statement_node),
+      type_annotation: _type,
     }
   }
 
@@ -110,30 +127,19 @@ impl<'b> Parser<'b> {
       None => {
         return Ok(Typing {
           kind: TypeKind::Inferred,
-          span: None,
         })
       }
     };
 
-    let span = Some(self.node_span(type_node));
-
-    match type_node.kind() {
-      "alpha_identifier" => match self.node_text(type_node) {
-        "string" => Ok(Typing {
-          kind: TypeKind::String,
-          span,
-        }),
-        "int" => Ok(Typing {
-          kind: TypeKind::Integer,
-          span,
-        }),
-        "bool" => Ok(Typing {
-          kind: TypeKind::Boolean,
-          span,
-        }),
-        _ => Err(()),
-      },
-      _ => Err(()),
+    match self.node_text(type_node) {
+      "string" => Ok(Typing { kind: TypeKind::String }),
+      "int" => Ok(Typing {
+        kind: TypeKind::Integer,
+      }),
+      "bool" => Ok(Typing {
+        kind: TypeKind::Boolean,
+      }),
+      _ => panic!("unkown type annotation: {}", type_node.kind())
     }
   }
 }

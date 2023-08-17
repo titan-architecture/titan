@@ -27,8 +27,8 @@ impl<'b> Interpreter<'b> {
 
   pub fn interpret_statement(&self, statement: &Statement, mut env: Environment) -> Environment {
     match &statement.kind {
-      StatementKind::Let { identifier, value, _type, .. } => {
-        env.define_variable(identifier.clone(), value.clone());
+      StatementKind::Let { identifier, value, type_annotation: _type, .. } => {
+        env.define_variable(identifier.clone(), format!("{:?}", value.kind));
       }
       StatementKind::Print { identifier, ..} => {
         // TODO: support printing expressions and literals
