@@ -30,21 +30,24 @@ function App() {
     }
   }
   return (
-    <div className="grid grid-cols-2 gap-4 w-screen">
-      <Editor
-        height="90vh"
-        theme="vs-dark"
-        language="javascript"
-        onChange={handleChange}
-        options={{}}
-      />
-      <Editor
-        height="90vh"
-        theme="vs-dark"
-        value={request?.rootNode.toString()}
-        options={{ readOnly: true, dropIntoEditor: { enabled: false } }}
-      />
-    </div>
+    <>
+      <h1>Playground</h1>
+      <div className="grid grid-cols-2 gap-4 w-screen">
+        <Editor
+          height="90vh"
+          theme="vs-dark"
+          language="javascript"
+          onChange={handleChange}
+          options={{}}
+        />
+        <Editor
+          height="90vh"
+          theme="vs-dark"
+          value={request?.rootNode.toString()}
+          options={{ readOnly: true, dropIntoEditor: { enabled: false } }}
+        />
+      </div>
+    </>
   );
 }
 
